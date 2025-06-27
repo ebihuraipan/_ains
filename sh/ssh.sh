@@ -1,5 +1,5 @@
 #!/bin/bash
-source .env 
+source ../.env 
 
 
 # SSHのインストール
@@ -36,6 +36,6 @@ chmod 600 ~/.ssh/authorized_keys
 
 
 # パブリックキーの追加
-cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/id_${USER_NAME}_ed25519.pub >> ~/.ssh/authorized_keys
 
 
