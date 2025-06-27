@@ -1,91 +1,98 @@
 #!/bin/bash
 
-# MySQLのインストール
-if ! command -v mysql &> /dev/null; then
-    echo "MySQLをインストールします..."
-    sudo pacman -S mariadb --noconfirm
-    echo "MySQLのインストールが完了しました！"
-else
-    echo "MySQLは既にインストールされています"
-fi
+# MySQLのインストールと設定スクリプト
+
+# MySQLサーバーのインストール
+sudo pacman -S mysql --noconfirm
+
 
 # MySQLの初期設定
-if [ ! -f "/var/lib/mysql/mysql.sock" ]; then
-    echo "MySQLの初期設定を行います..."
-    sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-    sudo systemctl start mariadb
-    sudo systemctl enable mariadb
-    echo "MySQLの初期設定が完了しました！"
-fi
+sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
 
-# MySQLのセキュリティ設定
-read -p "MySQLのrootパスワードを設定してください: " MYSQL_ROOT_PASSWORD
 
-mysql -u root << EOF
-ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
-FLUSH PRIVILEGES;
-EOF
+# MySQLサービス
+sudo systemctl start mysqld
+sudo systemctl enable mysqld
 
-# サンプルデータベースとユーザーの作成
-read -p "サンプルデータベースを作成しますか？（y/n）: " CREATE_SAMPLE
 
-if [ "$CREATE_SAMPLE" = "y" ] || [ "$CREATE_SAMPLE" = "Y" ]; then
-    # サンプルデータベースの作成
-    mysql -u root -p$MYSQL_ROOT_PASSWORD << EOF
-CREATE DATABASE IF NOT EXISTS sample_db;
+# MySQLのバージョン確認
+echo "MySQLのバージョンを確認します:"
+mysql --version
 
-# サンプルユーザーの作成
-CREATE USER IF NOT EXISTS 'sample_user'@'localhost' IDENTIFIED BY 'sample_password';
-GRANT ALL PRIVILEGES ON sample_db.* TO 'sample_user'@'localhost';
-FLUSH PRIVILEGES;
 
-# サンプルテーブルの作成
-USE sample_db;
+# MySQLのログイン方法を表示
+echo "MySQLにログインするには以下のコマンドを使用してください:"
+echo "mysql -u root -p"
 
+
+# テストデータベースとテーブルの作成
+echo "テストデータベースとテーブルを作成します..."
+sudo mysql -e "
+CREATE DATABASE IF NOT EXISTS db;
+USE db;
+
+-- テスト用テーブルの作成
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 投稿テーブルの作成
 CREATE TABLE IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    title VARCHAR(100) NOT NULL,
-    content TEXT,
+    user_id INT NOT NULL,
+    content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-# サンプルデータの挿入
-INSERT INTO users (username, email) VALUES 
-('user1', 'user1@example.com'),
-('user2', 'user2@example.com'),
-('user3', 'user3@example.com');
+-- テストデータの挿入
+INSERT INTO users (name, email) VALUES
+('田中太郎', 'tanaka@example.com'),
+('鈴木花子', 'suzuki@example.com'),
+('山田一郎', 'yamada@example.com'),
+('佐藤美咲', 'satou@example.com'),
+('高橋健太', 'takahashi@example.com'),
+('中村真由美', 'nakamura@example.com'),
+('木村大輔', 'kimura@example.com'),
+('加藤美香', 'kato@example.com'),
+('伊藤健太郎', 'ito@example.com'),
+('小林菜々子', 'kobayashi@example.com');
 
-INSERT INTO posts (user_id, title, content) VALUES 
-(1, 'First Post', 'This is the first post.'),
-(1, 'Second Post', 'This is the second post.'),
-(2, 'Third Post', 'This is the third post.');
+-- 投稿データの挿入
+INSERT INTO posts (user_id, content) VALUES
+(1, '新しいプロジェクトを始動しました！'),
+(2, '今日のランチは美味しいカフェで過ごしました'),
+(3, 'Pythonの新しいライブラリを見つけました'),
+(4, '週末の旅行計画を立てています'),
+(5, '新しい本を読み始めました'),
+(6, '今日の運動はジョギングでした'),
+(7, 'プログラミングの勉強会を開催しました'),
+(8, '新しい音楽を発見しました'),
+(9, '料理のレシピを試してみました'),
+(10, '新しい趣味を見つけました'),
+(1, 'プロジェクトの進捗を確認しました'),
+(2, '新しいカフェを見つけました'),
+(3, 'Pythonのコードをリファクタリングしました'),
+(4, '旅行の準備を進めています'),
+(5, '本の感想をまとめました'),
+(6, '運動の記録を更新しました'),
+(7, '勉強会の資料を作成しました'),
+(8, '音楽のプレイリストを作成しました'),
+(9, '料理の写真を撮りました'),
+(10, '趣味の道具を購入しました');
 
-SELECT 'サンプルデータベースとテーブルの作成が完了しました！' as message;
-EOF
-fi
+-- ユーザーごとの投稿を確認
+SELECT u.name, p.content, p.created_at 
+FROM users u 
+JOIN posts p ON u.id = p.user_id 
+ORDER BY p.created_at DESC;"
 
-# 確認メッセージ
-echo "MySQLのインストールと設定が完了しました！"
-echo "以下の情報でMySQLにアクセスできます："
-echo "- ホスト: localhost"
-echo "- ユーザー: root"
-echo "- パスワード: $MYSQL_ROOT_PASSWORD"
+# テストデータベースの確認方法を表示
+echo "テストデータベースを確認するには以下のコマンドを使用してください:"
+echo "mysql -u root -p db"
 
-if [ "$CREATE_SAMPLE" = "y" ] || [ "$CREATE_SAMPLE" = "Y" ]; then
-    echo "- サンプルデータベース: sample_db"
-    echo "- サンプルユーザー: sample_user"
-    echo "- サンプルパスワード: sample_password"
-fi
+echo "データベースとテーブルの作成が完了しました。"
 
-# MySQLのサービス状態の確認
-echo "\nMySQLのサービス状態を確認します："
-systemctl status mariadb --no-pager
