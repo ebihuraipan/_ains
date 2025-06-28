@@ -7,6 +7,6 @@ sudo pacman -S  vim
 touch ~/.vimrc
 
 # Vimの設定を追加
-echo "set number"
+echo "set number" >> ~/.vimrc
 echo "inoremap <silent> jj <Esc>" >> ~/.vimrc
 
