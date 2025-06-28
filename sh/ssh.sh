@@ -21,7 +21,7 @@ chmod 700 ~/.ssh
 
 # SSHキーの生成
 read -p "SSHキーのパスフレーズを入力してください（空にするとパスフレーズなし）: " passphrase
-ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)" -f ~/.ssh/id_${USER_NAME}_ed25519 -N "$passphrase"
+ssh-keygen -t ed25519 -C "${USER_NAME}@${USER_NAME}" -f ~/.ssh/id_${USER_NAME}_ed25519 -N "$passphrase"
 
 # 公開鍵ファイルのパーミッション設定
 # chmod 600 ~/.ssh/id_ed25519

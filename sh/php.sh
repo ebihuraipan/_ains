@@ -47,7 +47,7 @@ sudo cp /etc/php/php.ini /etc/php/php.ini.bak
 
 
 # PHPの設定を最適化
-perl pl/http_conf.pl
+perl ../pl/http_conf.pl
 
 
 # Apacheの起動と自動起動の設定
