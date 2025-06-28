@@ -13,11 +13,11 @@ n list
 
 
 # yarnのインストール
-npm install -g yarn
+sudo npm install -g yarn
 
 
 # pnpmのインストール
-npm install -g pnpm
+sudo npm install -g pnpm
 
 
 # 環境変数の更新
