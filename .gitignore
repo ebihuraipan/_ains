@@ -1,2 +1,5 @@
 # 環境変数ファイル
 .env
+
+# GitHubの鍵
+sec/github.key
