@@ -16,6 +16,11 @@ if ! command -v "git" &> /dev/null; then
 fi
 
 
+# 鍵のコピー
+cat ../sec/github.key > ~/.ssh/${GITHUB_KEY}
+chmod 600 ~/.ssh/${GITHUB_KEY}
+
+
 # SSHの設定ファイルを編集
 echo "" >> ~/.ssh/config
 echo "" >> ~/.ssh/config
