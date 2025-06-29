@@ -2,9 +2,16 @@
 source ../.env
 
 
-# ディレクトリの存在チェック関数
-if [ ! -d "~/.ssh/config" ]; then
-    echo "エラー: ~/.ssh/config が見つかりません"
+# SSH設定ファイルの存在チェック
+if [ ! -f "$HOME/.ssh/config" ]; then
+    echo "エラー: SSH設定ファイルが見つかりません。"
+    exit 1
+fi
+
+
+# gitのチェック
+if ! command -v "git" &> /dev/null; then
+    echo "エラー: git コマンドが見つかりません"
     exit 1
 fi
 
@@ -17,5 +24,7 @@ echo "IdentityFile ~/.ssh/${GITHUB_KEY}" >> ~/.ssh/config
 echo "User git" >> ~/.ssh/config
 
 
+#テスト用
+echo "テスト用: git clone git@github.com:ebihuraipan/_ains.git"
 
 
