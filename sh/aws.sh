@@ -41,3 +41,6 @@ aws --version
 
 # セッションの作成（必要に応じて）
 # aws sts get-session-token --duration-seconds 3600
+# aws sts get-caller-identity --profile default
+
+
