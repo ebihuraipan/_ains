@@ -13,6 +13,9 @@ sudo pacman -g
 pacman -Ss ■■■
 
 
+#インストール
+sudo pacman -S ■■■
+
 #インストール済みパッケージ
 pacman -Q
 
