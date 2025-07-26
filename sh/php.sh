@@ -46,8 +46,23 @@ sudo cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bak
 sudo cp /etc/php/php.ini /etc/php/php.ini.bak
 
 
-# PHPの設定を最適化
-perl ../pl/http_conf.pl
+# apache、PHPの設定
+# cp ../tmpl/httpd.conf.sample /etc/httpd/conf/httpd.conf
+
+# /etc/httpd/conf/httpd.conf の以下の行をコメントアウトしてください: 
+sudo sed -i 's/LoadModule mpm_event_module/#LoadModule mpm_event_module/' /etc/httpd/conf/httpd.conf
+
+# そして次の行をアンコメントしてください: 
+sudo sed -i 's/#LoadModule mpm_prefork_module/LoadModule mpm_prefork_module/' /etc/httpd/conf/httpd.conf
+
+# 次の行を LoadModule リストの LoadModule dir_module modules/mod_dir.so の後のどこかに記述:
+sudo sed -i '/^#LoadModule rewrite_module.*$/a\\n\n# 次の行をLoadModuleリストのLoadModule dir_module modules/mod_dir.soの後のどこかに記述' /etc/httpd/conf/httpd.conf
+sudo sed -i '/# 次の行を/a\LoadModule php_module modules/libphp.so' /etc/httpd/conf/httpd.conf
+sudo sed -i '/LoadModule php_module modules/a\AddType application/x-httpd-php .php\n\n'  /etc/httpd/conf/httpd.conf
+
+#次の行を Include リストの最後に記述:
+sudo sed -i '/# Secure .* connections/i\# 次の行をIncludeリストの最後に記述\n\n'  /etc/httpd/conf/httpd.conf
+sudo sed -i '/# 次の行をIncludeリストの最後に記述/a\Include conf/extra/php_module.conf'  /etc/httpd/conf/httpd.conf
 
 
 # Apacheの起動と自動起動の設定
